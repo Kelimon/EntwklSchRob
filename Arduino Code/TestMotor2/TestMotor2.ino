@@ -47,11 +47,7 @@ void loop() {
   digitalWrite(Motor2a, LOW); //Motor 2 ausfahren
   digitalWrite(Motor2b, HIGH);
   -----------------------------------------------------------------------------------------------------------
-
-  digitalWrite(Motor1a, HIGH); //Motor 1 ausfahren
-  digitalWrite(Motor1b, LOW);
   */
-  //------------------------------------------- Vorder Stellung erreicht
 
   digitalWrite(Motor1a, LOW);  //Motor 1 einfahren
   digitalWrite(Motor1b, HIGH);
