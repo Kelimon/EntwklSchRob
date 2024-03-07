@@ -20,17 +20,19 @@ print(stockfish.get_board_visual())
 cap = utilities.init_camera(frame_width=1920, frame_height=1080, exposure=-6.5)
 
 
-
-print("1")
+framecount = framecounter = 15
 while True:
-    ret, frame = utilities.capture_frame(cap)
-    if not ret:
-        print("Fehler beim Erfassen des Bildes")
-        break
+    image_path = './chessboard.jpg'  # Update this to the path of your image
+    frame = cv2.imread(image_path)
+    #ret, frame = utilities.capture_frame(cap)
+    #if not ret:
+     #   print("Fehler beim Erfassen des Bildes")
+      #  break
 
     ret, corners = utilities.find_chessboard(frame)
-    is_occupied = utilities.calc_average_colors(ret, frame, corners)
-
+    
+    is_occupied = utilities.calc_average_colors(ret, frame, corners, framecount, framecounter)
+    framecounter -=1
     utilities.display_frame(frame)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break

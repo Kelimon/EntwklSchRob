@@ -1,6 +1,45 @@
 import numpy as np
 import cv2
 
+def find_outer_corners(inner_corners, chessboard_size=(7,7)):
+    # Reshape the inner corners array for convenience
+    inner_corners = inner_corners.reshape(chessboard_size[0], chessboard_size[1], 2)
+    
+    # Calculate average distances between corners horizontally and vertically
+    horizontal_distances = np.diff(inner_corners[:, :, 0], axis=1)
+    vertical_distances = np.diff(inner_corners[:, :, 1], axis=0)
+    
+    avg_horizontal_distance = np.mean(horizontal_distances)
+    avg_vertical_distance = np.mean(vertical_distances)
+    
+    # Initialize an array to store the full set of corners
+    full_corners = np.zeros((chessboard_size[0] + 2, chessboard_size[1] + 2, 2))
+    
+    # Place the inner corners into the full corners array
+    full_corners[1:-1, 1:-1] = inner_corners
+    
+    # Extrapolate the top and bottom row of corners
+    full_corners[0, 1:-1] = inner_corners[0] - np.array([[0, avg_vertical_distance]])
+    full_corners[-1, 1:-1] = inner_corners[-1] + np.array([[0, avg_vertical_distance]])
+    
+    # Extrapolate the leftmost and rightmost corners
+    full_corners[:, 0] = full_corners[:, 1] - np.array([[avg_horizontal_distance, 0]])
+    full_corners[:, -1] = full_corners[:, -2] + np.array([[avg_horizontal_distance, 0]])
+    
+    # Handle the four corners
+    full_corners[0, 0] = full_corners[1, 0] - np.array([[0, avg_vertical_distance]])
+    full_corners[-1, 0] = full_corners[-2, 0] + np.array([[0, avg_vertical_distance]])
+    full_corners[0, -1] = full_corners[0, -2] - np.array([[avg_horizontal_distance, 0]])
+    full_corners[-1, -1] = full_corners[-1, -2] + np.array([[avg_horizontal_distance, 0]])
+    
+    return full_corners.reshape(-1, 2)
+
+# Example usage:
+# inner_corners should be a numpy array of shape (49, 1, 2)
+# containing the 49 inner corner positions detected by cv2.findChessboardCorners()
+
+
+
 def is_point_in_list(point, points_list):
     return any((point == p).all() for p in points_list)
 
@@ -39,26 +78,10 @@ def is_occupied(color_value, color_range):
                color_range['g'][0] <= color_value[1] <= color_range['g'][1] and
                color_range['r'][0] <= color_value[2] <= color_range['r'][1])
 
-def init_camera(frame_width, frame_height, exposure):
-    cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, frame_width)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, frame_height)
-    cap.set(cv2.CAP_PROP_EXPOSURE, exposure)  # Belichtung einstellen, Wertebereich abhängig von der Kamera
-    return cap
 
 
-def find_chessboard(frame):
-    chessboard_size = (7, 7)
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    ret, corners = cv2.findChessboardCorners(gray, chessboard_size, None)
-    return ret, corners
-
-def capture_frame(cap):
-    ret, frame = cap.read()
-    return ret, frame
-
-def calc_average_colors(ret, frame, corners):
-    framecount = framecounter = 15
+def calc_average_colors(ret, frame, corners, framecount, framecounter):
+    
     
     cumulative_avg_rgb_values = np.zeros((6, 6, 3), dtype=float) # Summe der durchschnittlichen RGB-Werte
     is_occupied = np.zeros((6, 6), dtype=bool) # Besetzt-Array initalisieren 
@@ -68,6 +91,7 @@ def calc_average_colors(ret, frame, corners):
 
         # Initialize an array to hold the average RGB values for the 49 inner fields
         avg_rgb_values = np.zeros((6, 6, 3), dtype=float)
+        final_avg_rgb_values = np.zeros((6, 6, 3), dtype=float)
         for i in range(6):
                 for j in range(6):
                     # Define the four corners of the current field using simplified corners
@@ -87,28 +111,32 @@ def calc_average_colors(ret, frame, corners):
 
                     # Calculate the average color within this ROI
                     avg_color = np.mean(field_roi, axis=(0, 1))
-
+            
                     if(framecounter>=0):
                         avg_rgb_values[i, j] = avg_color
+                        print("avgrgbvalues", avg_rgb_values)
+                        print("avgcolor is", avg_color)
+                        print("framecounter", framecounter)
                     else:
                         difference = np.abs(avg_color - final_avg_rgb_values[i, j])
-                        print(difference)
+                        
                         if np.any(difference > 20):
                             is_occupied[i, j] = True  # Mark the field as occupied
                         else:
                             is_occupied[i, j] = False
 
-
+        print("avgrgbvalues", avg_rgb_values)
+        print("isoccupied", is_occupied)
+        print("framecounter", framecounter)
+        print("framecount", framecount)
+        print("cumulative_avg_rgb_values", cumulative_avg_rgb_values)
+        print("final_avg_rgb_values", final_avg_rgb_values)
         if(framecounter>=0):
             cumulative_avg_rgb_values += avg_rgb_values
-        else:
-            print("occupied fields")
-            print(is_occupied)
         if(framecounter==0):
             final_avg_rgb_values = cumulative_avg_rgb_values / (framecount +1)
-            print("final")
-            print(final_avg_rgb_values)
-        framecounter -=1
+
+        
         
 
         cv2.drawChessboardCorners(frame, (7, 7), cornersForDrawing, ret)
@@ -118,3 +146,26 @@ def calc_average_colors(ret, frame, corners):
 
 def display_frame(frame):
     cv2.imshow('Schachbrett Detektor', frame)
+
+
+class ChessSquare:
+    def __init__(self, position, piece='-', mean_rgb_value=None, status='empty'):
+        self.position = position        # The position on the board, e.g., 'a1', 'd4', etc.
+        self.piece = piece              # The piece on the square: 'P', 'p', 'R', 'r', etc., or '-' for empty
+        self.mean_rgb_value = mean_rgb_value  # The mean RGB value of the square
+        self.status = status            # The status of the square: 'empty', 'occupied', etc.
+
+# Initialize a dictionary with the starting piece positions
+starting_pieces = {
+    'a1': 'R', 'b1': 'N', 'c1': 'B', 'd1': 'Q', 'e1': 'K', 'f1': 'B', 'g1': 'N', 'h1': 'R',
+    'a2': 'P', 'b2': 'P', 'c2': 'P', 'd2': 'P', 'e2': 'P', 'f2': 'P', 'g2': 'P', 'h2': 'P',
+    'a7': 'p', 'b7': 'p', 'c7': 'p', 'd7': 'p', 'e7': 'p', 'f7': 'p', 'g7': 'p', 'h7': 'p',
+    'a8': 'r', 'b8': 'n', 'c8': 'b', 'd8': 'q', 'e8': 'k', 'f8': 'b', 'g8': 'n', 'h8': 'r'
+}
+
+# Create a list of all board positions
+chess_positions = [f"{chr(file)}{rank}" for rank in range(1, 9) for file in range(ord('a'), ord('h')+1)]
+
+# Initialize the board with ChessSquare objects
+board = [ChessSquare(position, starting_pieces.get(position, '-')) for position in chess_positions]
+print(board)
