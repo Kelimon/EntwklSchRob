@@ -8,7 +8,7 @@ class StockfishIntegration:
         """Setzt die aktuelle Position auf dem Schachbrett mit einer FEN-Notation."""
         self.stockfish.set_fen_position(fen_str)
         
-    def get_best_move(self, time=1000):
+    def get_best_move(self, time=1):
         """Ermittelt den besten Zug für die aktuelle Position innerhalb einer bestimmten Zeit."""
         return self.stockfish.get_best_move_time(time)
         

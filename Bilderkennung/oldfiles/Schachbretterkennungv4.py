@@ -6,7 +6,7 @@ import utilities
 import subprocess
 from stockfish import Stockfish
 
-stockfish = Stockfish(path="./stockfish/stockfish-windows-x86-64-avx2.exe")
+stockfish = Stockfish(path="./../stockfish/stockfish-windows-x86-64-avx2.exe")
 print(stockfish.is_fen_valid("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"))
 stockfish.set_fen_position("rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2")
 print(stockfish.get_board_visual())
