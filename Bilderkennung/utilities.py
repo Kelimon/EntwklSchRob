@@ -6,33 +6,32 @@ def find_outer_corners(inner_corners, chessboard_size=(7,7)):
     inner_corners = inner_corners.reshape(chessboard_size[0], chessboard_size[1], 2)
     
     # Calculate average distances between corners horizontally and vertically
-    horizontal_distances = np.diff(inner_corners[:, :, 0], axis=1)
-    vertical_distances = np.diff(inner_corners[:, :, 1], axis=0)
-    
-    avg_horizontal_distance = np.mean(horizontal_distances)
-    avg_vertical_distance = np.mean(vertical_distances)
+    horizontal_distances = np.diff(inner_corners[:, :, 0], axis=1).mean()
+    vertical_distances = np.diff(inner_corners[:, :, 1], axis=0).mean()
     
     # Initialize an array to store the full set of corners
     full_corners = np.zeros((chessboard_size[0] + 2, chessboard_size[1] + 2, 2))
     
-    # Place the inner corners into the full corners array
-    full_corners[1:-1, 1:-1] = inner_corners
+    # Fill in the inner corners
+    full_corners[1:-1, 1:-1, :] = inner_corners
     
-    # Extrapolate the top and bottom row of corners
-    full_corners[0, 1:-1] = inner_corners[0] - np.array([[0, avg_vertical_distance]])
-    full_corners[-1, 1:-1] = inner_corners[-1] + np.array([[0, avg_vertical_distance]])
+    # Extrapolate the first and last row
+    full_corners[0, 1:-1, :] = inner_corners[0, :, :] - [0, vertical_distances]
+    full_corners[-1, 1:-1, :] = inner_corners[-1, :, :] + [0, vertical_distances]
     
-    # Extrapolate the leftmost and rightmost corners
-    full_corners[:, 0] = full_corners[:, 1] - np.array([[avg_horizontal_distance, 0]])
-    full_corners[:, -1] = full_corners[:, -2] + np.array([[avg_horizontal_distance, 0]])
+    # Extrapolate the first and last column
+    full_corners[1:-1, 0, :] = inner_corners[:, 0, :] - [horizontal_distances, 0]
+    full_corners[1:-1, -1, :] = inner_corners[:, -1, :] + [horizontal_distances, 0]
     
-    # Handle the four corners
-    full_corners[0, 0] = full_corners[1, 0] - np.array([[0, avg_vertical_distance]])
-    full_corners[-1, 0] = full_corners[-2, 0] + np.array([[0, avg_vertical_distance]])
-    full_corners[0, -1] = full_corners[0, -2] - np.array([[avg_horizontal_distance, 0]])
-    full_corners[-1, -1] = full_corners[-1, -2] + np.array([[avg_horizontal_distance, 0]])
+    # Extrapolate the four corners
+    full_corners[0, 0, :] = full_corners[1, 0, :] - [0, vertical_distances]
+    full_corners[0, -1, :] = full_corners[1, -1, :] - [0, vertical_distances]
+    full_corners[-1, 0, :] = full_corners[-2, 0, :] + [0, vertical_distances]
+    full_corners[-1, -1, :] = full_corners[-2, -1, :] + [0, vertical_distances]
     
-    return full_corners.reshape(-1, 2)
+    return full_corners.reshape((-1, 2))
+
+
 
 # Example usage:
 # inner_corners should be a numpy array of shape (49, 1, 2)
@@ -46,7 +45,6 @@ def is_point_in_list(point, points_list):
 
 def sort_corners(corners):
     sorted_rows = []
-    
     while len(corners) > 0:
         # Finde den obersten linken Punkt
         corners = corners.reshape(-1, 2)

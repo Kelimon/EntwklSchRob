@@ -16,8 +16,7 @@ print(stockfish.get_board_visual())
 stockfish.make_moves_from_current_position(["b7b5"])
 print(stockfish.get_board_visual())
 
-# init camera 
-cap = utilities.init_camera(frame_width=1920, frame_height=1080, exposure=-6.5)
+
 
 
 framecount = framecounter = 15
@@ -30,7 +29,7 @@ while True:
       #  break
 
     ret, corners = utilities.find_chessboard(frame)
-    
+    utilities.sort_corners(corners)
     is_occupied = utilities.calc_average_colors(ret, frame, corners, framecount, framecounter)
     framecounter -=1
     utilities.display_frame(frame)

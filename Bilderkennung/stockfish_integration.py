@@ -19,8 +19,11 @@ class StockfishIntegration:
     def get_fen_position(self):
         """Gibt die aktuelle Position als FEN-String zurück."""
         return self.stockfish.get_fen_position()
+    
+    def get_board_visual(self):
+        return self.stockfish.get_board_visual()
 
-# Beispiel für die Verwendung:
+'''# Beispiel für die Verwendung:
 # Pfad zur Stockfish-Executable aktualisieren
 stockfish_path = "./stockfish/stockfish-windows-x86-64-avx2.exe"
 stockfish_integration = StockfishIntegration(stockfish_path)
@@ -29,4 +32,4 @@ stockfish_integration = StockfishIntegration(stockfish_path)
 fen_position = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 stockfish_integration.set_fen_position(fen_position)
 best_move = stockfish_integration.get_best_move()
-print(f"Der beste Zug ist: {best_move}")
+print(f"Der beste Zug ist: {best_move}")'''
