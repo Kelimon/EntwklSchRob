@@ -54,7 +54,7 @@ def sort_corners(corners):
         top_left_point = corners[top_left_index]
         
         # Finde alle Punkte in der gleichen Reihe
-        row_points = [point for point in corners if abs(point[1] - top_left_point[1]) <= 15]
+        row_points = [point for point in corners if abs(point[1] - top_left_point[1]) <= 25]
         
         # Sortiere die Punkte in der Reihe nach ihrer X-Koordinate
         row_points_sorted = sorted(row_points, key=lambda x: x[0])

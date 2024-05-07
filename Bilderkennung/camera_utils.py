@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 
-def init_camera(frame_width, frame_height, exposure):
+def init_camera(frame_width, frame_height, exposure, brightness=0.5):
     """
     Initializes the camera with specified frame width, height, and exposure.
     """
@@ -15,6 +15,7 @@ def init_camera(frame_width, frame_height, exposure):
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, frame_width)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, frame_height)
     cap.set(cv2.CAP_PROP_EXPOSURE, exposure)
+    cap.set(cv2.CAP_PROP_BRIGHTNESS, brightness)
     
     return cap
 
@@ -25,10 +26,32 @@ def capture_frame(cap):
     ret, frame = cap.read()
     if not ret:
         raise IOError("Failed to capture image")
-    cv2.imshow('Schachbrett Detektor', frame)
-    cv2.waitKey(1)
-
+    frame =adjust_brightness_and_contrast(frame, brightness=0, contrast=0)
     return frame
+
+def adjust_brightness_and_contrast(frame, brightness=0, contrast=0):
+    if brightness != 0:
+        if brightness > 0:
+            shadow = brightness
+            highlight = 255
+        else:
+            shadow = 0
+            highlight = 255 + brightness
+        alpha_b = (highlight - shadow) / 255
+        gamma_b = shadow
+        
+        buf = cv2.addWeighted(frame, alpha_b, frame, 0, gamma_b)
+    else:
+        buf = frame.copy()
+
+    if contrast != 0:
+        f = 131 * (contrast + 127) / (127 * (131 - contrast))
+        alpha_c = f
+        gamma_c = 127 * (1 - f)
+        
+        buf = cv2.addWeighted(buf, alpha_c, buf, 0, gamma_c)
+
+    return buf
 
 def find_chessboard(frame, chessboard_size=(7, 7)):
     """
@@ -36,8 +59,6 @@ def find_chessboard(frame, chessboard_size=(7, 7)):
     """
     
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    cv2.imshow('Schachbrett Detektoreee', gray)
-    cv2.waitKey(1)
     ret, corners = cv2.findChessboardCorners(frame, chessboard_size, None)
 
 
