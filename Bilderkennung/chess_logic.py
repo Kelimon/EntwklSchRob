@@ -6,9 +6,11 @@ class ChessSquare:
         self.position = position
         self.piece = piece
         self.rgb_values = []
+        self.std_devations= []
         self.last_rgb_value = (0, 0, 0)
         self.mean_rgb_value = np.array(mean_rgb_value)
-        self.status = status
+        self.std_deviation = np.zeros(3)
+        self.last_std_deviation = np.zeros(3)
 
         if self.piece != '-':
             self.status = 'occupied'
@@ -73,20 +75,34 @@ class ChessBoard:
             square.mean_rgb_value = np.mean(square.rgb_values, axis=0)
             square.rgb_values=[]
 
-    def     find_most_significant_changes(self, num_changes=5):
+            square.last_std_deviation = square.std_deviation
+            square.std_deviation = np.mean(square.std_devations, axis=0)
+            square.std_devations = []
+
+            print("square " + square.position + 
+      " last rgb " + str(square.last_rgb_value) + 
+      " new rgb " + str(square.mean_rgb_value) + 
+      " last std " + str(square.last_std_deviation) + 
+      " new std " + str(square.std_deviation))
+
+        
+
+    def find_most_significant_changes(self, num_changes=12):
         changes = []
         for square in self.squares:
             difference = np.linalg.norm(np.array(square.last_rgb_value) - np.array(square.mean_rgb_value))
-            changes.append((square.position, difference))
-                
-        
+           
+            std_deviation_difference = np.linalg.norm(np.array(square.last_std_deviation) - np.array(square.std_deviation))    
+            total_difference = difference + std_deviation_difference
+            changes.append((square.position, total_difference))
         # Sortieren der Veränderungen nach ihrer Signifikanz
+ 
         changes.sort(key=lambda x: x[1], reverse=True)
-        print("changes", changes)
+     
         # Auswahl der n signifikantesten Veränderungen
         significant_changes = changes[:num_changes]
-        print("changes", significant_changes)
-        return [change[0] for change in significant_changes]
+        #print("changes", significant_changes)
+        return [change for change in significant_changes]
 
 
     def calculate_average_rgb_for_each_square(self, frame, corners):
@@ -95,26 +111,45 @@ class ChessBoard:
 
         # Ecken zu einem 7x7 Gitter umformen
         #corners_reshaped = corners.reshape((7, 7, 2))
-
+        margin_ratio = 0.6
         for row in range(8):  # 6 Reihen von Feldern, basierend auf den 7x7 erkannten Ecken
             for col in range(8):  # 6 Spalten von Feldern
-                # Ecken für das aktuelle Feld extrahieren
                 top_left = corners[row * 9 + col]
                 top_right = corners[row * 9 + (col + 1)]
                 bottom_left = corners[(row + 1) * 9 + col]
                 bottom_right = corners[(row + 1) * 9 + (col + 1)]
-                # Compute the bounding rectangle of the current field
-                x_min = int(min(top_left[0], bottom_left[0], top_right[0], bottom_right[0]))
-                x_max = int(max(top_left[0], bottom_left[0], top_right[0], bottom_right[0]))
-                y_min = int(min(top_left[1], bottom_left[1], top_right[1], bottom_right[1]))
-                y_max = int(max(top_left[1], bottom_left[1], top_right[1], bottom_right[1]))
+                # Calculate the margins to reduce the ROI
+                width_margin = int((top_right[0] - top_left[0]) * margin_ratio / 2)
+                height_margin = int((bottom_left[1] - top_left[1]) * margin_ratio / 2)
+                # Adjust corners to focus on the center of the square
+                center_top_left = (int(top_left[0] + width_margin), int(top_left[1] + height_margin))
+                center_bottom_right = (int(bottom_right[0] - width_margin), int(bottom_right[1] - height_margin))
+   
+                # Draw the rectangle on the image for visualization
+                cv2.rectangle(frame, center_top_left, center_bottom_right, (0, 255, 0), 2)  # Green rectangle
 
-                # Extract the region of interest (ROI) from the frame
-                field_roi = frame[y_min:y_max, x_min:x_max]
+                # Extract the ROI for average color calculation
+                field_roi = frame[center_top_left[1]:center_bottom_right[1], center_top_left[0]:center_bottom_right[0]]
 
                 # Calculate the average color within this ROI
                 avg_color = np.mean(field_roi, axis=(0, 1))
+                
                 self.squares[row * 8 + col].rgb_values.append(avg_color)
+                print("#######")
+                print("#######")
+                print("#######")
+                print("#######")
+                print("#######")
+                print("#######")
+                print("#######")
+                print("#######")
+                print("#######")
+                print("#######")
+                print("#######")
+                print("#######")
+                print("last deviation", self.squares[row * 8 + col].last_std_deviation)
+                print("current deviation", self.squares[row * 8 + col].std_deviation)
+                self.squares[row * 8 + col].std_devations.append(np.std(field_roi, axis=(0, 1)))
                 #self.squares[row * 8 + col].update_square(new_rgb_value=avg_color)
                 '''
                 top_left = corners_reshaped[row, col]
@@ -143,6 +178,8 @@ class ChessBoard:
                 if chess_square:
                     chess_square.update_square(new_rgb_value=square_rgb)
 '''
+        cv2.imshow('Schachbrett Detektor from Main.py', frame)
+        cv2.waitKey(1)  # Wait indefinitely until a key is pressed
         return True
 
     

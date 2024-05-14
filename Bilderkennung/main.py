@@ -14,6 +14,7 @@ def main():
     # Pfad zu Stockfish aktualisieren
     stockfish_path = "./stockfish/stockfish-windows-x86-64-avx2.exe"
     stockfish = StockfishIntegration(stockfish_path)
+    
 
     # Kamera initialisieren
     cap = init_camera(frame_width, frame_height, exposure)
@@ -23,106 +24,106 @@ def main():
     chess_board.initialize_board()
 
     # Anzahl der Frames zum Sammeln von Durchschnittswerten
-    num_initial_frames = 20
-    num_update_frames = 5
+    num_initial_frames = 10
+    num_update_frames = 3
     
-    corners = np.array([[[ 647.0712,232.02425]],
+    corners = np.array([[[ 658.5039 ,304.37497]],
 
- [[ 739.4819,228.35521]],
+ [[ 720.90546,304.15814]],
 
- [[ 834.1669,224.77872]],
+ [[ 783.3413, 303.84518]],
 
- [[ 929.33923,  220.82657]],
+ [[ 845.9845, 303.32153]],
 
- [[1026.0697,215.3635 ]],
+ [[ 908.43915,302.86517]],
 
- [[1126.8667,212.31221]],
+ [[ 970.82025,302.819]],
 
- [[1224.2217,212.54715]],
+ [[1033.0961, 302.73743]],
 
- [[ 646.01074 , 324.5525 ]],
+ [[ 659.7971, 367.34088]],
 
- [[ 739.31604,  321.4727 ]],
+ [[ 722.0644, 367.06445]],
 
- [[ 834.45685 , 318.68585]],
+ [[ 784.2212, 366.5902 ]],
 
- [[ 930.07025 , 315.68277]],
+ [[ 846.79456,366.46075]],
 
- [[1027.5708,311.4062 ]],
+ [[ 908.9427, 366.24954]],
 
- [[1127.8978,309.3516 ]],
+ [[ 971.01965,365.97467]],
 
- [[1226.7626,308.17816]],
+ [[1033.0374, 365.429]],
 
- [[ 645.6104,419.0477 ]],
+ [[ 661.34045,429.67065]],
 
- [[ 738.89935 , 416.74258]],
+ [[ 722.9752, 429.0975 ]],
 
- [[ 834.08575,  414.222  ]],
+ [[ 784.7633, 428.82614]],
 
- [[ 931.23486 , 412.25342]],
+ [[ 846.53436,428.0052 ]],
 
- [[1029.1982,409.3813 ]],
+ [[ 908.38824,427.95358]],
 
- [[1128.7009,408.11462]],
+ [[ 970.27966,427.35077]],
 
- [[1228.6074,406.1022 ]],
+ [[1031.7573, 426.7821 ]],
 
- [[ 645.82513 , 514.8506 ]],
+ [[ 663.79443,491.27243]],
 
- [[ 738.70044 , 513.07227]],
+ [[ 724.8407, 490.73492]],
 
- [[ 835.2613,511.5421 ]],
+ [[ 786.10095,490.3452 ]],
 
- [[ 932.1856,509.59543]],
+ [[ 847.3418, 490.16492]],
 
- [[1030.5969,508.1064 ]],
+ [[ 908.8806, 489.52182]],
 
- [[1129.3817,505.882  ]],
+ [[ 970.3716, 489.1594 ]],
 
- [[1229.8591,505.74414]],
+ [[1031.0383, 488.14993]],
 
- [[ 644.89496 , 609.60815]],
+ [[ 665.76697,551.9146 ]],
 
- [[ 739.23987 , 609.169  ]],
+ [[ 726.3908, 551.70026]],
 
- [[ 835.5949,608.40234]],
+ [[ 787.1125, 551.8192 ]],
 
- [[ 932.7306,607.5327 ]],
+ [[ 848.03314,550.24524]],
 
- [[1031.7302,606.06885]],
+ [[ 909.35425,550.42676]],
 
- [[1131.0094,604.78064]],
+ [[ 970.3378, 549.5271 ]],
 
- [[1232.2039,605.54236]],
+ [[1030.6948, 549.1129 ]],
 
- [[ 645.171, 706.92096]],
+ [[ 667.4523, 612.58203]],
 
- [[ 739.8678,706.66187]],
+ [[ 728.1356, 612.20715]],
 
- [[ 836.57434 , 706.26794]],
+ [[ 788.8524, 611.8425 ]],
 
- [[ 932.89734 , 707.2751 ]],
+ [[ 849.2287, 610.5089 ]],
 
- [[1032.3875,706.8548 ]],
+ [[ 909.5147, 609.7383 ]],
 
- [[1133.187, 706.3839 ]],
+ [[ 970.14404,609.01715]],
 
- [[1233.9265,706.4007 ]],
+ [[1029.9763, 608.1199 ]],
 
- [[ 645.3948,803.7289 ]],
+ [[ 669.1043, 672.4522 ]],
 
- [[ 741.34515 , 804.50104]],
+ [[ 729.39294,671.88434]],
 
- [[ 836.7894,805.4356 ]],
+ [[ 789.84375,670.2831 ]],
 
- [[ 933.8482,806.77563]],
+ [[ 849.9975, 669.6963 ]],
 
- [[1033.7184,808.10614]],
+ [[ 910.1094, 668.78796]],
 
- [[1133.2488,807.34515]],
+ [[ 969.8227, 667.6552 ]],
 
- [[1235.4996,808.04584]]])
+ [[1029.511,  667.2147 ]]])
     
     sorted_corners = utilities.sort_corners(corners)
     #print("outercoernsers",utilities.find_outer_corners(inner_corners=sorted_corners)).reshape(-1, 1, 2)
@@ -130,26 +131,52 @@ def main():
     outer_corners_np = np.array(outer_corners, dtype=np.float32).reshape(-1, 1, 2)
     sorted_outer_corners = utilities.sort_corners(outer_corners_np)
     try:
+        for _ in range(5):
+            ret, frame = capture_frame(cap)
+        while True:
+            ret, frame = capture_frame(cap) # Read a frame from the camera
+            if not ret:
+                print("Failed to capture image")
+                break
+            
+            cv2.imshow('Schachbrett Detektor from Main.py', frame)  # Display the frame
+            k = cv2.waitKey(1)  # Wait for 1 ms
+            
+            if k == 13:  # Check if 'Enter' key (which has ASCII code 13) is pressed
+                print("Enter pressed, continuing...")
+                break
+        loop =True
+        while loop:
+            ret, corners = find_chessboard(frame)
+            
+            
+            print("cornersasd", corners)
+            if ret:
+                sorted_corners = utilities.sort_corners(corners)
+                #print("outercoernsers",utilities.find_outer_corners(inner_corners=sorted_corners)).reshape(-1, 1, 2)
+                outer_corners = utilities.find_outer_corners(inner_corners=sorted_corners)
+                outer_corners_np = np.array(outer_corners, dtype=np.float32).reshape(-1, 1, 2)
+                sorted_outer_corners = utilities.sort_corners(outer_corners_np)
+                loop = False
+            else:
+                ret, frame = capture_frame(cap)
+        print("sorted outer conrenrs", sorted_outer_corners)
+        input("Figuren platzieren und Enter um fortzusetzen...")        
         # Durchschnittliche RGB-Werte für jedes Feld am Anfang sammeln
+
         for _ in range(num_initial_frames):
 
             for _ in range(5):
-                frame = capture_frame(cap)
-
-            '''loop =True
-            while loop:
-                ret, corners = find_chessboard(frame)
-                if ret:
-                    loop = False
-                else:
-                    frame = capture_frame(cap)'''
-
-            print("corners", corners)
+                ret, frame = capture_frame(cap)
+            
+            
+            
             
             #print("outercorenrsreshape", outer_corners.reshape(-1, 1, 2))
             cv2.drawChessboardCorners(frame, (9,9), sorted_outer_corners,  True)
+            cv2.waitKey(100)
             cv2.imshow('Schachbrett Detektor from Main.py', frame)
-            cv2.waitKey(1)
+            cv2.waitKey(100)
             if True:
                 chess_board.calculate_average_rgb_for_each_square(frame, corners=sorted_outer_corners)
                 pass
@@ -166,7 +193,7 @@ def main():
         while(True):
             while(True):
                 for _ in range(num_update_frames):
-                    frame = capture_frame(cap)
+                    ret, frame = capture_frame(cap)
 
                 '''loop =True
                 while loop:
@@ -188,7 +215,7 @@ def main():
 
                 changes = chess_board.find_most_significant_changes()  
                 print("changes", changes)
-                move_made = chess_board.update_chessboard(changes, whiteTurn)
+                #move_made = chess_board.update_chessboard(changes, whiteTurn)
                 input("Drücken Sie Enter, nachdem ein Zug gemacht wurde...")
                 whiteTurn = not whiteTurn
             
