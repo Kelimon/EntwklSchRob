@@ -4,8 +4,25 @@ from chess_logic import ChessBoard
 from stockfish_integration import StockfishIntegration
 import utilities
 import numpy as np
+import serial
+import time
+
+
+arduino = serial.Serial(port='/dev/ttyACM0', baudrate=9600, timeout=.1)
+time.sleep(2)  # Warte, bis die serielle Verbindung hergestellt ist
+
+def write_read(command):
+    arduino.write(bytes(command + '\n', 'utf-8'))
+    while True:
+        data = arduino.readline().decode('utf-8').rstrip()
+        print("data", data)
+        if data == "done":
+            break
+    return data
 
 def main():
+    write_read("h1h8")
+    print("write_read is done")
     # Kameraeinstellungen (Diese Werte sollten angepasst werden)
     frame_width = 1920
     frame_height = 1080
@@ -26,110 +43,8 @@ def main():
     # Anzahl der Frames zum Sammeln von Durchschnittswerten
     num_initial_frames = 10
     num_update_frames = 3
+   
     
-    corners = np.array([[[ 658.5039 ,304.37497]],
-
- [[ 720.90546,304.15814]],
-
- [[ 783.3413, 303.84518]],
-
- [[ 845.9845, 303.32153]],
-
- [[ 908.43915,302.86517]],
-
- [[ 970.82025,302.819]],
-
- [[1033.0961, 302.73743]],
-
- [[ 659.7971, 367.34088]],
-
- [[ 722.0644, 367.06445]],
-
- [[ 784.2212, 366.5902 ]],
-
- [[ 846.79456,366.46075]],
-
- [[ 908.9427, 366.24954]],
-
- [[ 971.01965,365.97467]],
-
- [[1033.0374, 365.429]],
-
- [[ 661.34045,429.67065]],
-
- [[ 722.9752, 429.0975 ]],
-
- [[ 784.7633, 428.82614]],
-
- [[ 846.53436,428.0052 ]],
-
- [[ 908.38824,427.95358]],
-
- [[ 970.27966,427.35077]],
-
- [[1031.7573, 426.7821 ]],
-
- [[ 663.79443,491.27243]],
-
- [[ 724.8407, 490.73492]],
-
- [[ 786.10095,490.3452 ]],
-
- [[ 847.3418, 490.16492]],
-
- [[ 908.8806, 489.52182]],
-
- [[ 970.3716, 489.1594 ]],
-
- [[1031.0383, 488.14993]],
-
- [[ 665.76697,551.9146 ]],
-
- [[ 726.3908, 551.70026]],
-
- [[ 787.1125, 551.8192 ]],
-
- [[ 848.03314,550.24524]],
-
- [[ 909.35425,550.42676]],
-
- [[ 970.3378, 549.5271 ]],
-
- [[1030.6948, 549.1129 ]],
-
- [[ 667.4523, 612.58203]],
-
- [[ 728.1356, 612.20715]],
-
- [[ 788.8524, 611.8425 ]],
-
- [[ 849.2287, 610.5089 ]],
-
- [[ 909.5147, 609.7383 ]],
-
- [[ 970.14404,609.01715]],
-
- [[1029.9763, 608.1199 ]],
-
- [[ 669.1043, 672.4522 ]],
-
- [[ 729.39294,671.88434]],
-
- [[ 789.84375,670.2831 ]],
-
- [[ 849.9975, 669.6963 ]],
-
- [[ 910.1094, 668.78796]],
-
- [[ 969.8227, 667.6552 ]],
-
- [[1029.511,  667.2147 ]]])
-    
-    sorted_corners = utilities.sort_corners(corners)
-    #print("outercoernsers",utilities.find_outer_corners(inner_corners=sorted_corners)).reshape(-1, 1, 2)
-    outer_corners = utilities.find_outer_corners(inner_corners=sorted_corners)
-    outer_corners_np = np.array(outer_corners, dtype=np.float32).reshape(-1, 1, 2)
-    sorted_outer_corners = utilities.sort_corners(outer_corners_np)
     try:
         for _ in range(5):
             ret, frame = capture_frame(cap)
@@ -150,7 +65,7 @@ def main():
             ret, corners = find_chessboard(frame)
             
             
-            print("cornersasd", corners)
+ 
             if ret:
                 sorted_corners = utilities.sort_corners(corners)
                 #print("outercoernsers",utilities.find_outer_corners(inner_corners=sorted_corners)).reshape(-1, 1, 2)

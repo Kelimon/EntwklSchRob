@@ -158,7 +158,7 @@ def main():
         
 
         whiteTurn = True
-        count =0
+        count = 0
         stockfish.set_fen_position("rnbqk3/8/8/8/8/8/8/3QKBNR w KQkq - 0 1")
         while(True):
             

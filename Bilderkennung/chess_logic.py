@@ -135,17 +135,7 @@ class ChessBoard:
                 avg_color = np.mean(field_roi, axis=(0, 1))
                 
                 self.squares[row * 8 + col].rgb_values.append(avg_color)
-                print("#######")
-                print("#######")
-                print("#######")
-                print("#######")
-                print("#######")
-                print("#######")
-                print("#######")
-                print("#######")
-                print("#######")
-                print("#######")
-                print("#######")
+                
                 print("#######")
                 print("last deviation", self.squares[row * 8 + col].last_std_deviation)
                 print("current deviation", self.squares[row * 8 + col].std_deviation)
@@ -216,7 +206,6 @@ class ChessBoard:
         from_square = None
         to_square = None
         print("changes", changes)
-        input("Drücken Sie Enter, wenn sie fortfahren wollen...")
         # Ermitteln, welches der geänderten Felder das Startfeld (from_square) ist
         for change in changes[:2]:
             square = self.get_square_by_position(change)
