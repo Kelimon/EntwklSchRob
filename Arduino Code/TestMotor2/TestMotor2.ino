@@ -1,7 +1,11 @@
-int Motor1a = 18;
-int Motor1b = 19;
-int Motor2a = 20;
-int Motor2b = 21;
+int Motor1a = 6;
+int Motor1b = 7;
+int Motor2a = 4;
+int Motor2b = 5;
+int motorvornea =18;
+int motorvorneb = 19;
+int magneta = 21;
+int magnetb = 20;
 
 
 void setup() {
@@ -32,9 +36,15 @@ void setup() {
 
   digitalWrite(Motor2a, LOW); //Motor 2 ausfahren
   digitalWrite(Motor2b, HIGH);
-  delay(2000);
+  delay(600);
   digitalWrite(Motor2a, LOW); //Motor 1 stop
   digitalWrite(Motor2b, LOW);
+
+
+
+  digitalWrite(magnetb, HIGH); //Magnet an
+  digitalWrite(magneta, LOW);
+  delay(2000);
 
 
 
