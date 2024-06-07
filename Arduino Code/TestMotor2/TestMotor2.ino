@@ -14,6 +14,10 @@ void setup() {
   pinMode(Motor1b, OUTPUT);
   pinMode(Motor2a, OUTPUT);
   pinMode(Motor2b, OUTPUT);
+  pinMode(Motorvornea, OUTPUT);
+  pinMode(Motorvorneb, OUTPUT);
+  pinMode(magneta, OUTPUT);
+  pinMode(magnetb, OUTPUT);
 
   digitalWrite(Motor1a, LOW); //Motor 1 einfahren
   digitalWrite(Motor1b, HIGH);
