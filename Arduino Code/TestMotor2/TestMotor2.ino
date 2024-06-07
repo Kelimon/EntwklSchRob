@@ -1,7 +1,7 @@
-int Motor1a = 6;
-int Motor1b = 7;
-int Motor2a = 4;
-int Motor2b = 5;
+int Motor1a = 18;
+int Motor1b = 19;
+int Motor2a = 20;
+int Motor2b = 21;
 
 
 void setup() {
