@@ -10,7 +10,10 @@ class StockfishIntegration:
         
     def get_best_move(self, time=1):
         """Ermittelt den besten Zug für die aktuelle Position innerhalb einer bestimmten Zeit."""
-        return self.stockfish.get_best_move_time(time)
+        best_move = self.stockfish.get_best_move_time(time)
+        piece = self.get_piece_at_move(best_move)
+        print("piece is", piece)
+        return best_move, piece
         
     def make_move(self, move):
         """Führt einen Zug aus und aktualisiert die Position auf dem Brett."""
@@ -22,6 +25,25 @@ class StockfishIntegration:
     
     def get_board_visual(self):
         return self.stockfish.get_board_visual()
+    
+    def get_piece_at_move(self, move):
+        """Gibt die Figur zurück, die sich am Ausgangspunkt des Zuges befindet."""
+        fen = self.get_fen_position().split(' ')[0]
+        rows = fen.split('/')
+        
+        from_square = move[:2]
+        col, row = ord(from_square[0]) - ord('a'), 8 - int(from_square[1])
+        
+        fen_row = rows[row]
+        current_col = 0
+        for char in fen_row:
+            if char.isdigit():
+                current_col += int(char)
+            else:
+                if current_col == col:
+                    return char
+                current_col += 1
+        return None
 
 '''# Beispiel für die Verwendung:
 # Pfad zur Stockfish-Executable aktualisieren
