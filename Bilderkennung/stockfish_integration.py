@@ -1,9 +1,22 @@
 from stockfish import Stockfish
 
 class StockfishIntegration:
-    def __init__(self, path_to_stockfish):
+    def __init__(self, path_to_stockfish, skill_level=10, elo_rating=None):
+        """
+        Initialisiert Stockfish mit optionalen Parametern für den Schwierigkeitsgrad und die ELO-Bewertung.
+        """
+        print("skill elvel ist", skill_level)
+        print("elorating", elo_rating)
         self.stockfish = Stockfish(path=path_to_stockfish)
-        
+        if elo_rating:
+            self.stockfish.update_engine_parameters({
+                "UCI_LimitStrength": "true",
+                "UCI_Elo": elo_rating
+            })
+        if skill_level is not None and not elo_rating:
+            self.stockfish.update_engine_parameters({
+                "Skill Level": skill_level
+            })
     def set_fen_position(self, fen_str):
         """Setzt die aktuelle Position auf dem Schachbrett mit einer FEN-Notation."""
         self.stockfish.set_fen_position(fen_str)

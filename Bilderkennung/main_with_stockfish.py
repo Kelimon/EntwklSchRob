@@ -20,7 +20,7 @@ def write_read(command):
             break
     return data
 
-def main():
+def main(skill_level, elo_rating):
  
     # Kameraeinstellungen (Diese Werte sollten angepasst werden)
     frame_width = 1920
@@ -29,7 +29,7 @@ def main():
 
     # Pfad zu Stockfish aktualisieren
     stockfish_path = "./stockfish/stockfish-windows-x86-64-avx2.exe"
-    stockfish = StockfishIntegration(stockfish_path)
+    stockfish = StockfishIntegration(stockfish_path, skill_level=skill_level, elo_rating=elo_rating)
     
 
     # Kamera initialisieren
