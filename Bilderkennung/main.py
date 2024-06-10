@@ -21,8 +21,7 @@ def write_read(command):
     return data
 
 def main():
-    write_read("h1h8")
-    print("write_read is done")
+ 
     # Kameraeinstellungen (Diese Werte sollten angepasst werden)
     frame_width = 1920
     frame_height = 1080
